@@ -34,6 +34,9 @@ async function main() {
         author: { name: 'swanchou', email: 'swanchou@users.noreply.github.com' }
     });
 
+    console.log('[4.5/5] 重命名分支 master → main...');
+    await git.branch({ fs, dir, ref: 'main', checkout: true });
+
     console.log('[5/5] 推送到 GitHub...');
     await git.push({
         fs,
