@@ -1,0 +1,52 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: phone-finder
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: phone-finder
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask flask-cors openpyxl pyinstaller
+
+      - name: Generate icon
+        run: python packaging/generate_icon.py
+        working-directory: phone-finder
+
+      - name: Build EXE with PyInstaller
+        run: pyinstaller --clean packaging/phone_finder.spec
+        working-directory: phone-finder
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Excel识别工具
+          path: phone-finder/dist/Excel识别工具/
+          retention-days: 30
